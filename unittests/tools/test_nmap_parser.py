@@ -160,3 +160,12 @@ class TestNmapParser(DojoTestCase):
 """
                 self.assertEqual(description, finding.description)
                 self.assertEqual("Info", finding.severity)
+
+    def test_parse_file_with_host_without_hostnames_element(self):
+        with (get_unit_tests_scans_path("nmap") / "nmap_no_hostnames.xml").open(encoding="utf-8") as testfile:
+            parser = NmapParser()
+            findings = parser.get_findings(testfile, Test())
+            self.validate_locations(findings)
+            self.assertEqual(1, len(findings))
+            self.assertEqual("Open port: 5432/tcp", findings[0].title)
+            self.assertEqual("192.0.2.1", self.get_unsaved_locations(findings[0])[0].host)
